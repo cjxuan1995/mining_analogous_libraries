@@ -14,29 +14,31 @@ def getDataFromDB():
     return rows
 
 def processDataRegex(data):
-    symbolList = ['=', '*', '{', '}', '[', ']', '&', '$']
+    symbolList = ['=', '*', '{', '}', '[', ']', '&', '$'] #This line and the next line mean that if any of those symbols appear in the code block, it will be considered as code, which will be removed.
     pattern = re.sub("<code>(.*?)</code>",
                      lambda m: "" if any(symbol in m.group(1) for symbol in symbolList) else m.group(), data,
                      flags=re.S)
 
     pattern = re.sub("</?[a-z][^>]*>", "", pattern)
-    pattern = re.sub("&nbsp;|&lt;|&gt;|&amp;|&quot;|&apos;", "", pattern)
-    pattern = re.sub("\*|~|`", "", pattern)
+    pattern = re.sub("&nbsp;|&lt;|&gt;|&amp;|&quot;|&apos;", "", pattern) #remove some html entities
+    pattern = re.sub("\*|~|`", "", pattern) #remove some symbols
 
     pattern = re.sub("http.+?&#xA", "&#xA", pattern)
     pattern = re.sub("http.+? ", " ", pattern)
     pattern = re.sub("http.+?$", "", pattern)
+    #Those three lines above are for handling url
+
     pattern = pattern.lower()
     return pattern
 
-def separateSentAndWord(processedData):
+def separateSentAndWord(processedData): #This function is for separating sentences based on punctuations and separating words.
     wordList = []
     sentence_list = re.split("&#xa;|!|\?|;|\. ", processedData)
 
     for sentence in sentence_list:
         if (not sentence.isspace()) and sentence:
             sentence = re.sub("\.$", "", sentence)
-            wordList.append(re.sub("[^\w|+|.|#|-]", " ", sentence).split())
+            wordList.append(re.sub("[^\w|+|.|#|-]", " ", sentence).split()) #Keep letters, numbers, +, ., # and -. Otherwise, replace them with space. The reason for keeping +, ., # is because they may be part of some software terms. C++, C#, angular.js and so on.
 
     return wordList
 
