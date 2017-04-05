@@ -3,7 +3,7 @@ import MySQLdb
 
 
 class Processor(object):
-    """The Processor class process the raw stack_overflow post data to more readable form.
+    """The Processor class processes the raw stack_overflow post data to more readable form.
 
     It contains five methods. Basically, only three methods should be accessed externally, which are get_data_from_db, write_data_to_file and write_raw_and_processed_data_to_file.
     """
@@ -63,26 +63,6 @@ class Processor(object):
                 word_list.append(re.sub(r"[^\w|\+|\.|#|-]", " ", sentence).split())  #Keep letters, numbers, +, ., # and -. Otherwise, replace them with space. The reason for keeping +, ., # is because they may be part of some software terms. C++, C#, angular.js and so on.
 
     return wordList
-
-
-def main():
-    rows = getDataFromDB()
-    fileName = raw_input("The name of the file storing processed data: ")
-    file = open(fileName, "w")
-    for row in rows:
-        processedData = processDataRegex(str(row))
-        wordList = separateSentAndWord(processedData)
-
-        for words in wordList:
-            newStr = " "
-            file.write("%s\n" % newStr.join(words))
-
-    file.close()
-
-if __name__ == "__main__": main()
-
-
-        return word_list
 
     def write_data_to_file(self, file_name, rows):
         """write processed data into a file
